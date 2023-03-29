@@ -20,12 +20,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.aop.CheckAccess;
+import com.example.demo.dto.OutputResponseDto;
 import com.example.demo.model.Camera;
 import com.example.demo.model.JwtRequest;
 import com.example.demo.repository.CameraRepository;
-
+import com.example.demo.service.CameraService;
 import com.example.demo.service.JwtGeneratorInterface;
 import com.example.demo.service.JwtService;
+import com.example.demo.utility.ResponseEntityGenerator;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -40,15 +42,22 @@ public class CameraController {
 	private JwtService jwtGenerator;
 	@Autowired
 	CameraRepository cameraRepository;
+	@Autowired
+	CameraService cameraService;
 	//@CrossOrigin(origins = "http://localhost:4200")
+	@Autowired
+	ResponseEntityGenerator responseEntityGenerator;
 	@CheckAccess
 	 @PostMapping("/v1/auth/camera")
-	  public ResponseEntity<Camera> addCamera(HttpServletRequest req,@RequestBody Camera camera) {
+	  public ResponseEntity<OutputResponseDto> addCamera(HttpServletRequest req,@RequestBody Camera camera) {
 	    try {
-	      Camera camera_ = cameraRepository.save(camera);
-	      return new ResponseEntity<>(camera_, HttpStatus.CREATED);
+	    	OutputResponseDto outputResponseDto=cameraService.addCameraDetails(camera);
+	    //  Camera camera_ = cameraRepository.save(camera);
+	      ///return new ResponseEntity<>(camera_, HttpStatus.CREATED);
+	      return responseEntityGenerator.getResponseEntity(outputResponseDto);
 	    } catch (Exception e) {
-	      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+	     // return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+	      throw e;
 	    }
 	  }
 	 @CheckAccess
